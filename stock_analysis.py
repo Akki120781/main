@@ -12,65 +12,66 @@ from datetime import datetime, timedelta
 
 warnings.filterwarnings('ignore')
 
-st.title("Stock Market Comparison Analysis")
+st.set_page_config(page_title="Stock Market Analysis", layout="wide")
 
-st.sidebar.header("User Inputs")
+st.markdown("""
+    <style>
+    .main {background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);}
+    .stButton>button {background: linear-gradient(90deg, #00ffcc, #00ccff); color: #0d1b2a; border-radius: 12px; font-weight: bold;}
+    .stButton>button:hover {background: linear-gradient(90deg, #00ccff, #00ffcc); color: #ffffff;}
+    .stSidebar {background: linear-gradient(180deg, #1e1e2f 0%, #2d2d44 100%); color: #e0e1dd;}
+    h1 {color: #00ffcc; font-family: 'Arial'; text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);}
+    h2 {color: #00ccff; font-family: 'Arial'; text-shadow: 0 0 5px rgba(0, 204, 255, 0.3);}
+    h3 {color: #ff007f; text-shadow: 0 0 5px rgba(255, 0, 127, 0.3);}
+    .metric-box {background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); color: #e0e1dd;}
+    .stDataFrame {background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 10px;}
+    </style>
+""", unsafe_allow_html=True)
 
-available_stocks = [
-    'BPCL.NS', 'RELIANCE.NS', 'TATAMOTORS.NS', 'INFY.NS', 'TCS.NS',
-    'HDFCBANK.NS', 'SBIN.NS', 'ITC.NS', 'HINDUNILVR.NS', 'ASIANPAINT.NS',
-    'ICICIBANK.NS', 'AXISBANK.NS', 'KOTAKBANK.NS', 'SUNPHARMA.NS', 'DRREDDY.NS',
-    'MARUTI.NS', 'BAJFINANCE.NS', 'HCLTECH.NS', 'WIPRO.NS', 'ADANIENT.NS', 'ONGC.NS',
-    'NTPC.NS', 'COALINDIA.NS', 'LT.NS', 'TECHM.NS'
-]
+st.title("Stock Market Comparison Dashboard")
 
-selected_stocks = st.sidebar.multiselect(
-    "Select Stocks to Compare",
-    options=available_stocks,
-    default=['BPCL.NS', 'RELIANCE.NS', 'TATAMOTORS.NS']
-)
-
-today = pd.to_datetime(datetime.now().date())
-
-start_date = st.sidebar.date_input("Start Date", value=pd.to_datetime('2020-01-01'))
-end_date = st.sidebar.date_input("End Date", value=today)
-
-test_size = st.sidebar.slider("Test Size (as % of data)", min_value=0.1, max_value=0.5, value=0.2, step=0.05)
 with st.sidebar:
-        st.markdown("---")
-        st.subheader("Developers")
-        
-        st.markdown("""
-        **Harsh Chauhan** (Reg: 12319734)  
-        [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/harshchauhan7534/)
-        """)
+    st.markdown("<h2 style='color: #00ffcc;'>Control Panel</h2>", unsafe_allow_html=True)
+    
+    available_stocks = [
+        'BPCL.NS', 'RELIANCE.NS', 'TATAMOTORS.NS', 'INFY.NS', 'TCS.NS',
+        'HDFCBANK.NS', 'SBIN.NS', 'ITC.NS', 'HINDUNILVR.NS', 'ASIANPAINT.NS',
+        'ICICIBANK.NS', 'AXISBANK.NS', 'KOTAKBANK.NS', 'SUNPHARMA.NS', 'DRREDDY.NS',
+        'MARUTI.NS', 'BAJFINANCE.NS', 'HCLTECH.NS', 'WIPRO.NS', 'ADANIENT.NS', 
+        'ONGC.NS', 'NTPC.NS', 'COALINDIA.NS', 'LT.NS', 'TECHM.NS'
+    ]
+    
+    selected_stocks = st.multiselect("Select Stocks", available_stocks, default=['BPCL.NS', 'RELIANCE.NS'])
+    today = pd.to_datetime(datetime.now().date())
+    start_date = st.date_input("Start Date", value=pd.to_datetime('2020-01-01'))
+    end_date = st.date_input("End Date", value=today)
+    test_size = st.slider("Test Size (%)", 10, 50, 20, 5)
+    
+    st.markdown("---")
+    st.markdown("<h3 style='color: #00ffcc;'>Developer</h3>", unsafe_allow_html=True)
+    st.markdown("""
+        <div style='color: #e0e1dd;'>
+            <strong>Akshat Soni</strong> (Reg: 12317750)<br>
+            <a href='https://www.linkedin.com/in/harshchauhan7534/' target='_blank'>
+                <img src='https://img.shields.io/badge/LinkedIn-0077B5?style=flat-square&logo=linkedin&logoColor=white'>
+            </a>
+        </div>
+    """, unsafe_allow_html=True)
 
 colors = {
-    'BPCL.NS': ('blue', 'orange'),
-    'RELIANCE.NS': ('green', 'red'),
-    'TATAMOTORS.NS': ('purple', 'brown'),
-    'INFY.NS': ('cyan', 'magenta'),
-    'TCS.NS': ('black', 'gray'),
-    'HDFCBANK.NS': ('darkblue', 'lightblue'),
-    'SBIN.NS': ('darkgreen', 'lime'),
-    'ITC.NS': ('darkred', 'pink'),
-    'HINDUNILVR.NS': ('darkcyan', 'lightcyan'),
-    'ASIANPAINT.NS': ('darkmagenta', 'violet'),
-    'ICICIBANK.NS': ('teal', 'coral'),
-    'AXISBANK.NS': ('indigo', 'salmon'),
-    'KOTAKBANK.NS': ('olive', 'gold'),
-    'SUNPHARMA.NS': ('maroon', 'peachpuff'),
-    'DRREDDY.NS': ('darkorange', 'lightyellow'),
-    'MARUTI.NS': ('navy', 'skyblue'),
-    'BAJFINANCE.NS': ('darkviolet', 'plum'),
-    'HCLTECH.NS': ('steelblue', 'lightpink'),
-    'WIPRO.NS': ('sienna', 'khaki'),
-    'ADANIENT.NS': ('crimson', 'lavender'),
-    'ONGC.NS': ('forestgreen', 'lightgreen'),
-    'NTPC.NS': ('darkslategray', 'aquamarine'),
-    'COALINDIA.NS': ('chocolate', 'bisque'),
-    'LT.NS': ('darkgoldenrod', 'palegoldenrod'),
-    'TECHM.NS': ('deeppink', 'lightcoral')
+    'BPCL.NS': ('#00ffcc', '#ff007f'), 'RELIANCE.NS': ('#00ccff', '#ffcc00'),
+    'TATAMOTORS.NS': ('#ff007f', '#00ff99'), 'INFY.NS': ('#ffcc00', '#ff00ff'),
+    'TCS.NS': ('#00ff99', '#ff6600'), 'HDFCBANK.NS': ('#ff00ff', '#00ccff'),
+    'SBIN.NS': ('#ff6600', '#ff007f'), 'ITC.NS': ('#00ffcc', '#ffcc00'),
+    'HINDUNILVR.NS': ('#ff007f', '#00ff99'), 'ASIANPAINT.NS': ('#ffcc00', '#ff00ff'),
+    'ICICIBANK.NS': ('#00ff99', '#ff6600'), 'AXISBANK.NS': ('#ff00ff', '#00ccff'),
+    'KOTAKBANK.NS': ('#ff6600', '#00ffcc'), 'SUNPHARMA.NS': ('#00ccff', '#ff007f'),
+    'DRREDDY.NS': ('#ff007f', '#ffcc00'), 'MARUTI.NS': ('#00ff99', '#ff00ff'),
+    'BAJFINANCE.NS': ('#ffcc00', '#ff6600'), 'HCLTECH.NS': ('#00ffcc', '#ff00ff'),
+    'WIPRO.NS': ('#ff6600', '#00ff99'), 'ADANIENT.NS': ('#ff00ff', '#00ccff'),
+    'ONGC.NS': ('#00ffcc', '#ff007f'), 'NTPC.NS': ('#ffcc00', '#00ff99'),
+    'COALINDIA.NS': ('#ff007f', '#ff6600'), 'LT.NS': ('#00ccff', '#ff00ff'),
+    'TECHM.NS': ('#00ff99', '#ffcc00')
 }
 
 features = ['Open', 'High', 'Low', 'Volume', 'MA5', 'MA20']
@@ -79,286 +80,150 @@ def get_stock_data(ticker, start_date, end_date):
     try:
         stock_data = yf.download(ticker, start=start_date, end=end_date)
         if stock_data.empty:
-            raise ValueError(f"No data found for {ticker} in the specified date range.")
+            return None
         stock_data.reset_index(inplace=True)
         stock_data['Date'] = pd.to_datetime(stock_data['Date'])
-        
         stock_data['MA5'] = stock_data['Close'].rolling(window=5).mean()
         stock_data['MA20'] = stock_data['Close'].rolling(window=20).mean()
         stock_data.dropna(inplace=True)
         return stock_data[['Date', 'Open', 'High', 'Low', 'Volume', 'MA5', 'MA20', 'Close']]
-    except Exception as e:
-        st.error(f"Error downloading data for {ticker}: {str(e)}")
+    except Exception:
         return None
-
-def filter_data(df, start_date, end_date):
-    return df[(df['Date'] >= pd.to_datetime(start_date)) & (df['Date'] <= pd.to_datetime(end_date))]
 
 def predict_future_ohlc(stock, df, model, scaler, start_date, end_date):
     future_ohlc = []
     last_row = df.iloc[-1]
-    
     current_date = start_date
     while current_date <= end_date:
-        future_features = np.array([
-            [float(last_row['Open']), float(last_row['High']), float(last_row['Low']),
-             float(last_row['Volume']), float(last_row['MA5']), float(last_row['MA20'])]
-        ])
+        future_features = np.array([[float(last_row[f]) for f in features]])
         future_features_scaled = scaler.transform(future_features)
         predicted_close = model.predict(future_features_scaled)[0]
-        
-        future_ohlc.append({
-            'Stock': stock,
-            'Date': current_date.strftime('%Y-%m-%d'),
-            'Close': float(predicted_close)
-        })
+        future_ohlc.append({'Stock': stock, 'Date': current_date.strftime('%Y-%m-%d'), 'Close': float(predicted_close)})
         current_date += timedelta(days=1)
-    
     return future_ohlc
 
 def run_analysis(selected_stocks, start_date, end_date, test_size):
     results = {}
     ohlc_data = []
     future_predictions = []
+    test_size = test_size / 100
 
     for stock in selected_stocks:
-        historical_end_date = min(today, pd.to_datetime(end_date))
-        df = get_stock_data(stock, start_date, historical_end_date + timedelta(days=1))
+        df = get_stock_data(stock, start_date, min(today, pd.to_datetime(end_date)) + timedelta(days=1))
         if df is None or df.empty:
             continue
         
         last_day_df = df[df['Date'] < today]
-        last_day_row = last_day_df.iloc[-1] if not last_day_df.empty else None
         today_df = df[df['Date'] == today]
-        today_row = today_df.iloc[0] if not today_df.empty else None
-
-        if last_day_row is not None:
-            last_date = last_day_df['Date'].iloc[-1].strftime('%Y-%m-%d')
+        if not last_day_df.empty:
             ohlc_data.append({
-                'Stock': stock,
-                'Date': f"{last_date} ",
-                'Open': float(last_day_row['Open']),
-                'High': float(last_day_row['High']),
-                'Low': float(last_day_row['Low']),
-                'Close': float(last_day_row['Close'])
+                'Stock': stock, 'Date': last_day_df['Date'].iloc[-1].strftime('%Y-%m-%d'),
+                'Open': float(last_day_df['Open'].iloc[-1]), 'High': float(last_day_df['High'].iloc[-1]),
+                'Low': float(last_day_df['Low'].iloc[-1]), 'Close': float(last_day_df['Close'].iloc[-1])
             })
-        
-        if today_row is not None:
-            today_date = today_df['Date'].iloc[0].strftime('%Y-%m-%d')
+        if not today_df.empty:
             ohlc_data.append({
-                'Stock': stock,
-                'Date': f"{today_date} ",
-                'Open': float(today_row['Open']),
-                'High': float(today_row['High']),
-                'Low': float(today_row['Low']),
-                'Close': float(today_row['Close'])
+                'Stock': stock, 'Date': today_df['Date'].iloc[0].strftime('%Y-%m-%d'),
+                'Open': float(today_df['Open'].iloc[0]), 'High': float(today_df['High'].iloc[0]),
+                'Low': float(today_df['Low'].iloc[0]), 'Close': float(today_df['Close'].iloc[0])
             })
-        else:
-            st.warning(f"No data available for {stock} on {today.strftime('%Y-%m-%d')} (Today).")
         
         X = df[features]
         y = df['Close']
-        
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(X)
-        
-        X_train, X_test, y_train, y_test = train_test_split(
-            X_scaled, y, test_size=test_size, random_state=42, shuffle=False
-        )
+        X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=test_size, random_state=42, shuffle=False)
         
         dates_train = df['Date'][:len(X_train)]
         dates_test = df['Date'][len(X_train):]
-        
         model = LinearRegression()
         model.fit(X_train, y_train)
         
         y_pred_train = model.predict(X_train)
         y_pred_test = model.predict(X_test)
-        
         mse = mean_squared_error(y_test, y_pred_test)
         rmse = np.sqrt(mse)
         r2 = r2_score(y_test, y_pred_test)
         
         results[stock] = {
-            'df': df,
-            'dates_train': dates_train,
-            'dates_test': dates_test,
-            'y_train': y_train,
-            'y_test': y_test,
-            'y_pred_train': y_pred_train,
-            'y_pred_test': y_pred_test,
-            'mse': mse,
-            'rmse': rmse,
-            'r2': r2,
-            'model': model,
-            'scaler': scaler
+            'df': df, 'dates_train': dates_train, 'dates_test': dates_test,
+            'y_train': y_train, 'y_test': y_test, 'y_pred_train': y_pred_train,
+            'y_pred_test': y_pred_test, 'mse': mse, 'rmse': rmse, 'r2': r2,
+            'model': model, 'scaler': scaler
         }
         
         if pd.to_datetime(end_date) > today:
-            future_start_date = today + timedelta(days=1)
-            future_ohlc = predict_future_ohlc(stock, df, model, scaler, future_start_date, pd.to_datetime(end_date))
-            future_predictions.extend(future_ohlc)
+            future_predictions.extend(predict_future_ohlc(stock, df, model, scaler, today + timedelta(days=1), pd.to_datetime(end_date)))
     
     return results, ohlc_data, future_predictions
 
-if st.button("Run Full Analysis"):
+if st.button("Run Analysis"):
     if not selected_stocks:
-        st.error("Please select at least one stock to analyze.")
+        st.error("Please select at least one stock.")
     else:
-        results, ohlc_data, future_predictions = run_analysis(selected_stocks, start_date, end_date, test_size)
-
+        with st.spinner("Analyzing stocks..."):
+            results, ohlc_data, future_predictions = run_analysis(selected_stocks, start_date, end_date, test_size)
+        
         if ohlc_data:
-            st.subheader("Last Day's and Today's STOCK Values")
+            st.markdown("<h2>Latest Stock Data</h2>", unsafe_allow_html=True)
             ohlc_df = pd.DataFrame(ohlc_data)
-            st.table(ohlc_df)
+            st.dataframe(ohlc_df.style.format("{:.2f}", subset=['Open', 'High', 'Low', 'Close']))
 
         if future_predictions:
-            st.subheader("Predicted STOCK Values for Future Dates")
+            st.markdown("<h2>Future Predictions</h2>", unsafe_allow_html=True)
             future_df = pd.DataFrame(future_predictions)
-            st.table(future_df)
-
-        for stock in selected_stocks:
-            if stock in results:
-                st.subheader(f"Results for {stock}")
-                st.write(f"MSE: {results[stock]['mse']:.2f}")
-                st.write(f"RMSE: {results[stock]['rmse']:.2f}")
-                st.write(f"R² Score: {results[stock]['r2']:.2f}")
+            st.dataframe(future_df.style.format("{:.2f}", subset=['Close']))
 
         if results:
-            st.subheader("Individual Stock Analysis (Full Period)")
-            fig1, axes = plt.subplots(len(selected_stocks), 1, figsize=(15, 5 * len(selected_stocks)))
-            if len(selected_stocks) == 1:
-                axes = [axes]
+            tab1, tab2 = st.tabs(["Metrics & Plots", "Comparison"])
             
-            for i, stock in enumerate(selected_stocks):
-                if stock in results:
-                    axes[i].plot(results[stock]['dates_train'], results[stock]['y_train'],
-                                label='Actual Train', color='blue', alpha=0.5)
-                    axes[i].plot(results[stock]['dates_train'], results[stock]['y_pred_train'],
-                                label='Predicted Train', color='green', linestyle='--')
-                    axes[i].plot(results[stock]['dates_test'], results[stock]['y_test'],
-                                label='Actual Test', color='red')
-                    axes[i].plot(results[stock]['dates_test'], results[stock]['y_pred_test'],
-                                label='Predicted Test', color='orange', linestyle='--')
-                    
-                    axes[i].set_title(f'{stock} Stock Price Analysis')
-                    axes[i].set_xlabel('Date')
-                    axes[i].set_ylabel('Close Price (Original Scale)')
-                    axes[i].legend()
-                    axes[i].grid(True)
-                    axes[i].tick_params(axis='x', rotation=45)
-                else:
-                    axes[i].text(0.5, 0.5, f"No data for {stock}",
-                                horizontalalignment='center', verticalalignment='center')
+            with tab1:
+                for stock in selected_stocks:
+                    if stock in results:
+                        st.markdown(f"<h3>{stock} Analysis</h3>", unsafe_allow_html=True)
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.markdown(f"<div class='metric-box'><b>MSE:</b> {results[stock]['mse']:.2f}</div>", unsafe_allow_html=True)
+                        with col2:
+                            st.markdown(f"<div class='metric-box'><b>RMSE:</b> {results[stock]['rmse']:.2f}</div>", unsafe_allow_html=True)
+                        with col3:
+                            st.markdown(f"<div class='metric-box'><b>R²:</b> {results[stock]['r2']:.2f}</div>", unsafe_allow_html=True)
+                        
+                        fig = plt.figure(figsize=(12, 4), facecolor='#0d1b2a')
+                        ax = plt.gca()
+                        ax.set_facecolor('#1b263b')
+                        ax.plot(results[stock]['dates_train'], results[stock]['y_train'], label='Train', color='#00ffcc', alpha=0.7)
+                        ax.plot(results[stock]['dates_train'], results[stock]['y_pred_train'], label='Pred Train', color='#ff007f', linestyle='--')
+                        ax.plot(results[stock]['dates_test'], results[stock]['y_test'], label='Test', color='#00ccff')
+                        ax.plot(results[stock]['dates_test'], results[stock]['y_pred_test'], label='Pred Test', color='#ffcc00', linestyle='--')
+                        ax.set_title(f'{stock} Analysis', color='#e0e1dd')
+                        ax.set_xlabel('Date', color='#e0e1dd')
+                        ax.set_ylabel('Price', color='#e0e1dd')
+                        ax.legend(facecolor='#1b263b', edgecolor='#00ffcc', labelcolor='#e0e1dd')
+                        ax.grid(True, alpha=0.2, color='#e0e1dd')
+                        ax.tick_params(axis='both', colors='#e0e1dd')
+                        plt.xticks(rotation=45)
+                        st.pyplot(fig)
             
-            plt.tight_layout()
-            st.pyplot(fig1)
-
-            st.subheader("Stock Comparison Summary (Full Period)")
-            comparison_data = []
-            for stock in selected_stocks:
-                if stock in results:
-                    comparison_data.append({
-                        'Stock': stock,
-                        'MSE': results[stock]['mse'],
-                        'RMSE': results[stock]['rmse'],
-                        'R² Score': results[stock]['r2']
-                    })
-            if comparison_data:
-                comparison_df = pd.DataFrame(comparison_data)
-                st.table(comparison_df.round(2))
-
-            st.subheader("Comparison of All Stocks - Test Period (Full Period)")
-            fig2 = plt.figure(figsize=(12, 6))
-            for stock in selected_stocks:
-                if stock in results:
-                    plt.plot(results[stock]['dates_test'], results[stock]['y_test'],
-                            label=f'{stock} Actual', color=colors[stock][0])
-                    plt.plot(results[stock]['dates_test'], results[stock]['y_pred_test'],
-                            label=f'{stock} Predicted', color=colors[stock][1], linestyle='--')
-
-            plt.title('Comparison of All Stocks - Test Period')
-            plt.xlabel('Date')
-            plt.ylabel('Close Price (Original Scale)')
-            plt.legend()
-            plt.grid(True)
-            plt.xticks(rotation=45)
-            plt.tight_layout()
-            st.pyplot(fig2)
-
-if st.button("Analyze Last Week"):
-    if not selected_stocks:
-        st.error("Please select at least one stock to analyze.")
-    else:
-        end_date_last_week = today
-        start_date_last_week = end_date_last_week - timedelta(days=7)
-        results, ohlc_data, future_predictions = run_analysis(selected_stocks, start_date, end_date, test_size)
-
-        if results:
-            st.subheader("Individual Stock Analysis (Last Week)")
-            fig3, axes = plt.subplots(len(selected_stocks), 1, figsize=(15, 5 * len(selected_stocks)))
-            if len(selected_stocks) == 1:
-                axes = [axes]
-
-            for i, stock in enumerate(selected_stocks):
-                if stock in results:
-                    df_last_week = filter_data(results[stock]['df'], start_date_last_week, end_date_last_week)
-                    if df_last_week.empty:
-                        st.warning(f"No data available for {stock} in the last week.")
-                        axes[i].text(0.5, 0.5, f"No data for {stock} (Last Week)",
-                                    horizontalalignment='center', verticalalignment='center')
-                        continue
-
-                    X_last_week = df_last_week[features]
-                    y_last_week = df_last_week['Close']
-                    scaler = StandardScaler()
-                    X_last_week_scaled = scaler.fit_transform(X_last_week)
-                    y_pred_last_week = results[stock]['model'].predict(X_last_week_scaled)
-
-                    axes[i].plot(df_last_week['Date'], y_last_week,
-                                label='Actual', color='blue')
-                    axes[i].plot(df_last_week['Date'], y_pred_last_week,
-                                label='Predicted', color='orange', linestyle='--')
-                    
-                    axes[i].set_title(f'{stock} Stock Price Analysis (Last Week)')
-                    axes[i].set_xlabel('Date')
-                    axes[i].set_ylabel('Close Price (Original Scale)')
-                    axes[i].legend()
-                    axes[i].grid(True)
-                    axes[i].tick_params(axis='x', rotation=45)
-                else:
-                    axes[i].text(0.5, 0.5, f"No data for {stock}",
-                                horizontalalignment='center', verticalalignment='center')
-
-            plt.tight_layout()
-            st.pyplot(fig3)
-
-            st.subheader("Comparison of All Stocks - Last Week")
-            fig4 = plt.figure(figsize=(12, 6))
-            for stock in selected_stocks:
-                if stock in results:
-                    df_last_week = filter_data(results[stock]['df'], start_date_last_week, end_date_last_week)
-                    if df_last_week.empty:
-                        continue
-
-                    X_last_week = df_last_week[features]
-                    y_last_week = df_last_week['Close']
-                    scaler = StandardScaler()
-                    X_last_week_scaled = scaler.fit_transform(X_last_week)
-                    y_pred_last_week = results[stock]['model'].predict(X_last_week_scaled)
-
-                    plt.plot(df_last_week['Date'], y_last_week,
-                            label=f'{stock} Actual', color=colors[stock][0])
-                    plt.plot(df_last_week['Date'], y_pred_last_week,
-                            label=f'{stock} Predicted', color=colors[stock][1], linestyle='--')
-
-            plt.title('Comparison of All Stocks - Last Week')
-            plt.xlabel('Date')
-            plt.ylabel('Close Price (Original Scale)')
-            plt.legend()
-            plt.grid(True)
-            plt.xticks(rotation=45)
-            plt.tight_layout()
-            st.pyplot(fig4)
-else:
-    st.info("Select stocks and click 'Run Full Analysis' or 'Analyze Last Week' to see the results.")
+            with tab2:
+                st.markdown("<h2>Stock Comparison</h2>", unsafe_allow_html=True)
+                comparison_data = [{'Stock': stock, 'MSE': results[stock]['mse'], 'RMSE': results[stock]['rmse'], 'R²': results[stock]['r2']} 
+                                 for stock in selected_stocks if stock in results]
+                if comparison_data:
+                    st.dataframe(pd.DataFrame(comparison_data).style.format("{:.2f}", subset=['MSE', 'RMSE', 'R²']))
+                
+                fig = plt.figure(figsize=(12, 6), facecolor='#0d1b2a')
+                ax = plt.gca()
+                ax.set_facecolor('#1b263b')
+                for stock in selected_stocks:
+                    if stock in results:
+                        ax.plot(results[stock]['dates_test'], results[stock]['y_test'], label=f'{stock} Actual', color=colors[stock][0])
+                        ax.plot(results[stock]['dates_test'], results[stock]['y_pred_test'], label=f'{stock} Pred', color=colors[stock][1], linestyle='--')
+                ax.set_title('All Stocks - Test Period', color='#e0e1dd')
+                ax.set_xlabel('Date', color='#e0e1dd')
+                ax.set_ylabel('Price', color='#e0e1dd')
+                ax.legend(facecolor='#1b263b', edgecolor='#00ffcc', labelcolor='#e0e1dd')
+                ax.grid(True, alpha=0.2, color='#e0e1dd')
+                ax.tick_params(axis='both', colors='#e0e1dd')
+                plt.xticks(rotation=45)
+                st.pyplot(fig)
